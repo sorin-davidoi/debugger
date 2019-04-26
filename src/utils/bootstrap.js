@@ -10,13 +10,9 @@ import ReactDOM from "react-dom";
 const { Provider } = require("react-redux");
 
 import { isFirefoxPanel, isDevelopment, isTesting } from "devtools-environment";
-import SourceMaps, {
-  startSourceMapWorker,
-  stopSourceMapWorker
-} from "devtools-source-map";
-import * as search from "../workers/search";
-import * as prettyPrint from "../workers/pretty-print";
-import * as parser from "../workers/parser";
+import SourceMaps from "devtools-source-map";
+// startSourceMapWorker,
+// stopSourceMapWorker
 
 import configureStore from "../actions/utils/create-store";
 import reducers from "../reducers";
@@ -68,34 +64,28 @@ export function bootstrapStore(
 }
 
 export function bootstrapWorkers() {
-  const workerPath = isDevelopment()
-    ? "assets/build"
-    : "resource://devtools/client/debugger/new/dist";
+  // const workerPath = isDevelopment()
+  //   ? "assets/build"
+  //   : "resource://devtools/client/debugger/new/dist";
 
-  if (isDevelopment()) {
-    // When used in Firefox, the toolbox manages the source map worker.
-    startSourceMapWorker(
-      `${workerPath}/source-map-worker.js`,
-      // This is relative to the worker itself.
-      "./source-map-worker-assets/"
-    );
-  }
+  // if (isDevelopment()) {
+  //   // When used in Firefox, the toolbox manages the source map worker.
+  //   startSourceMapWorker(
+  //     `${workerPath}/source-map-worker.js`,
+  //     // This is relative to the worker itself.
+  //     "./source-map-worker-assets/"
+  //   );
+  // }
 
-  prettyPrint.start(`${workerPath}/pretty-print-worker.js`);
-  parser.start(`${workerPath}/parser-worker.js`);
-  search.start(`${workerPath}/search-worker.js`);
-  return { prettyPrint, parser, search };
+  return {};
 }
 
-export function teardownWorkers() {
-  if (!isFirefoxPanel()) {
-    // When used in Firefox, the toolbox manages the source map worker.
-    stopSourceMapWorker();
-  }
-  prettyPrint.stop();
-  parser.stop();
-  search.stop();
-}
+// export function teardownWorkers() {
+//   if (!isFirefoxPanel()) {
+//     // When used in Firefox, the toolbox manages the source map worker.
+//     stopSourceMapWorker();
+//   }
+// }
 
 export function bootstrapApp(store: any) {
   if (isFirefoxPanel()) {

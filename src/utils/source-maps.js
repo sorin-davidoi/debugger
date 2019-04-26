@@ -19,10 +19,11 @@ export async function getGeneratedLocation(
     return location;
   }
 
-  const { line, sourceId, column } = await sourceMaps.getGeneratedLocation(
-    location,
-    source
-  );
+  const {
+    line,
+    sourceId,
+    column
+  } = await sourceMaps.worker.getGeneratedLocation(location, source);
 
   const generatedSource = getSource(state, sourceId);
   if (!generatedSource) {
@@ -45,7 +46,7 @@ export async function getOriginalLocation(
     return location;
   }
 
-  return sourceMaps.getOriginalLocation(generatedLocation);
+  return sourceMaps.worker.getOriginalLocation(generatedLocation);
 }
 
 export async function getMappedLocation(
@@ -70,7 +71,7 @@ export async function getMappedLocation(
   }
 
   const generatedLocation = location;
-  const originalLocation = await sourceMaps.getOriginalLocation(
+  const originalLocation = await sourceMaps.worker.getOriginalLocation(
     generatedLocation
   );
 
@@ -92,7 +93,7 @@ export async function mapLocation(
     return getGeneratedLocation(state, source, location, sourceMaps);
   }
 
-  return sourceMaps.getOriginalLocation(location);
+  return sourceMaps.worker.getOriginalLocation(location);
 }
 
 export function isOriginalSource(source: ?Source) {

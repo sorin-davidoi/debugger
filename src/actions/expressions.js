@@ -21,7 +21,7 @@ import { wrapExpression } from "../utils/expressions";
 import { features } from "../utils/prefs";
 import { isOriginal } from "../utils/source";
 
-import * as parser from "../workers/parser";
+import parser from "../workers/parser";
 import type { Expression } from "../types";
 import type { ThunkArgs } from "./types";
 

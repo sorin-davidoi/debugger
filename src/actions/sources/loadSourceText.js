@@ -14,7 +14,7 @@ import { setBreakpointPositions } from "../breakpoints";
 
 import { prettyPrintSource } from "./prettyPrint";
 
-import * as parser from "../../workers/parser";
+import parser from "../../workers/parser";
 import { isLoaded, isOriginal, isPretty } from "../../utils/source";
 import { Telemetry } from "devtools-modules";
 
@@ -42,7 +42,7 @@ async function loadSource(
   }
 
   if (isOriginal(source)) {
-    const result = await sourceMaps.getOriginalSourceText(source);
+    const result = await sourceMaps.worker.getOriginalSourceText(source);
     if (!result) {
       // The way we currently try to load and select a pending
       // selected location, it is possible that we will try to fetch the

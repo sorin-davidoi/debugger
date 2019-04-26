@@ -4,80 +4,94 @@
 
 // @flow
 
-import { workerUtils } from "devtools-utils";
-const { WorkerDispatcher } = workerUtils;
+import { LazyWorker } from "../utils";
 
 import type { AstLocation, AstPosition } from "./types";
 import type { SourceLocation, Source, SourceId } from "../../types";
 import type { SourceScope } from "./getScopes/visitor";
 import type { SymbolDeclarations } from "./getSymbols";
 
-const dispatcher = new WorkerDispatcher();
-export const start = (url: string, win: any = window) =>
-  dispatcher.start(url, win);
-export const stop = () => dispatcher.stop();
+class ParserWorker extends LazyWorker {
+  constructor() {
+    super("parser-worker.js");
+  }
 
-export const findOutOfScopeLocations = async (
-  sourceId: string,
-  position: AstPosition
-): Promise<AstLocation[]> =>
-  dispatcher.invoke("findOutOfScopeLocations", sourceId, position);
+  async findOutOfScopeLocations(
+    sourceId: string,
+    position: AstPosition
+  ): Promise<AstLocation[]> {
+    return (await this.task("findOutOfScopeLocations"))(sourceId, position);
+  }
 
-export const getNextStep = async (
-  sourceId: SourceId,
-  pausedPosition: AstPosition
-): Promise<?SourceLocation> =>
-  dispatcher.invoke("getNextStep", sourceId, pausedPosition);
+  async getNextStep(
+    sourceId: string,
+    pausedPosition: AstPosition
+  ): Promise<?SourceLocation> {
+    return (await this.task("getNextStep"))(sourceId, pausedPosition);
+  }
 
-export const clearASTs = async (): Promise<void> =>
-  dispatcher.invoke("clearASTs");
+  async clearASTs(): Promise<void> {
+    return (await this.task("clearASTs"))();
+  }
 
-export const getScopes = async (
-  location: SourceLocation
-): Promise<SourceScope[]> => dispatcher.invoke("getScopes", location);
+  async getScopes(location: SourceLocation): Promise<SourceScope[]> {
+    return (await this.task("getScopes"))(location);
+  }
 
-export const clearScopes = async (): Promise<void> =>
-  dispatcher.invoke("clearScopes");
+  async clearScopes(): Promise<void> {
+    return (await this.task("clearScopes"))();
+  }
 
-export const clearSymbols = async (): Promise<void> =>
-  dispatcher.invoke("clearSymbols");
+  async clearSymbols(): Promise<void> {
+    return (await this.task("clearSymbols"))();
+  }
 
-export const getSymbols = async (
-  sourceId: string
-): Promise<SymbolDeclarations> => dispatcher.invoke("getSymbols", sourceId);
+  async getSymbols(sourceId: string): Promise<SymbolDeclarations> {
+    return (await this.task("getSymbols"))(sourceId);
+  }
 
-export const hasSource = async (sourceId: SourceId): Promise<Source> =>
-  dispatcher.invoke("hasSource", sourceId);
+  async hasSource(sourceId: SourceId): Promise<Source> {
+    return (await this.task("hasSource"))(sourceId);
+  }
 
-export const setSource = async (source: Source): Promise<void> =>
-  dispatcher.invoke("setSource", source);
+  async setSource(source: Source): Promise<void> {
+    return (await this.task("setSource"))(source);
+  }
 
-export const clearSources = async (): Promise<void> =>
-  dispatcher.invoke("clearSources");
+  async clearSources(): Promise<void> {
+    return (await this.task("clearSources"))();
+  }
 
-export const hasSyntaxError = async (input: string): Promise<string | false> =>
-  dispatcher.invoke("hasSyntaxError", input);
+  async hasSyntaxError(input: string): Promise<string | false> {
+    return (await this.task("hasSyntaxError"))(input);
+  }
 
-export const mapExpression = async (
-  expression: string,
-  mappings: {
-    [string]: string | null
-  } | null,
-  bindings: string[],
-  shouldMapBindings?: boolean,
-  shouldMapAwait?: boolean
-): Promise<{ expression: string }> =>
-  dispatcher.invoke(
-    "mapExpression",
-    expression,
-    mappings,
-    bindings,
-    shouldMapBindings,
-    shouldMapAwait
-  );
+  async mapExpression(
+    expression: string,
+    mappings: {
+      [string]: string | null
+    } | null,
+    bindings: string[],
+    shouldMapBindings?: boolean,
+    shouldMapAwait?: boolean
+  ): Promise<{ expression: string }> {
+    return (await this.task("mapExpression"))(
+      expression,
+      mappings,
+      bindings,
+      shouldMapBindings,
+      shouldMapAwait
+    );
+  }
 
-export const getFramework = async (sourceId: string): Promise<?string> =>
-  dispatcher.invoke("getFramework", sourceId);
+  async getFramework(sourceId: SourceId): Promise<?string> {
+    return (await this.task("getFramework"))(sourceId);
+  }
+}
+
+const parserWorker = new ParserWorker();
+
+export default parserWorker;
 
 export type {
   SourceScope,

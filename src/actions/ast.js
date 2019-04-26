@@ -19,7 +19,7 @@ import { PROMISE } from "./utils/middleware/promise";
 
 import { setInScopeLines } from "./ast/setInScopeLines";
 
-import * as parser from "../workers/parser";
+import parser, { type AstPosition } from "../workers/parser";
 
 import { isLoaded } from "../utils/source";
 
@@ -30,6 +30,7 @@ export function setSourceMetaData(sourceId: SourceId) {
   return async ({ dispatch, getState }: ThunkArgs) => {
     const source = getSource(getState(), sourceId);
     if (!source || !isLoaded(source) || source.isWasm) {
+      console.warn("Droping source", source);
       return;
     }
 
@@ -88,7 +89,7 @@ export function setOutOfScopeLocations() {
     if (location.line && source && !source.isWasm) {
       locations = await parser.findOutOfScopeLocations(
         source.id,
-        ((location: any): parser.AstPosition)
+        ((location: any): AstPosition)
       );
     }
 

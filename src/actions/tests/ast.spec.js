@@ -40,13 +40,15 @@ const threadClient = {
 };
 
 const sourceMaps = {
-  getOriginalSourceText: async ({ id }) => ({
-    id,
-    text: sourceTexts[id],
-    contentType: "text/javascript"
-  }),
-  getGeneratedRangesForOriginal: async () => [],
-  getOriginalLocations: async items => items
+  worker: {
+    getOriginalSourceText: async ({ id }) => ({
+      id,
+      text: sourceTexts[id],
+      contentType: "text/javascript"
+    }),
+    getGeneratedRangesForOriginal: async () => [],
+    getOriginalLocations: async items => items
+  }
 };
 
 const sourceTexts = {
@@ -73,6 +75,7 @@ describe("ast", () => {
 
       await dispatch(actions.newSource(source));
 
+      console.log(getSource(getState(), source.id));
       await dispatch(actions.loadSourceText(getSource(getState(), source.id)));
       await dispatch(actions.setSourceMetaData(source.id));
 

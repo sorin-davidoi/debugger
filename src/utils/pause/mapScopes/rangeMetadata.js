@@ -40,7 +40,10 @@ export async function loadRangeMetadata(
 ): Promise<Array<MappedOriginalRange>> {
   const originalRanges: Array<
     SourceOriginalRange
-  > = await sourceMaps.getOriginalRanges(frame.location.sourceId, source.url);
+  > = await sourceMaps.worker.getOriginalRanges(
+    frame.location.sourceId,
+    source.url
+  );
 
   const sortedOriginalAstBindings = [];
   for (const item of originalAstScopes) {

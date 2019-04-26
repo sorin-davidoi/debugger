@@ -61,8 +61,10 @@ describe("sources - new sources", () => {
       threadClient,
       {},
       {
-        getOriginalURLs: async () => ["magic.js"],
-        getOriginalLocations: async items => items
+        worker: {
+          getOriginalURLs: async () => ["magic.js"],
+          getOriginalLocations: async items => items
+        }
       }
     );
 
@@ -79,8 +81,10 @@ describe("sources - new sources", () => {
       threadClient,
       {},
       {
-        getOriginalURLs,
-        getOriginalLocations: async items => items
+        worker: {
+          getOriginalURLs,
+          getOriginalLocations: async items => items
+        }
       }
     );
 
@@ -94,8 +98,10 @@ describe("sources - new sources", () => {
       threadClient,
       {},
       {
-        getOriginalURLs: async () => new Promise(_ => {}),
-        getOriginalLocations: async items => items
+        worker: {
+          getOriginalURLs: async () => new Promise(_ => {}),
+          getOriginalLocations: async items => items
+        }
       }
     );
     const baseSource = makeSource("base.js", { sourceMapURL: "base.js.map" });
@@ -111,16 +117,18 @@ describe("sources - new sources", () => {
       threadClient,
       {},
       {
-        getOriginalURLs: async source => {
-          if (source.id == "foo.js") {
-            // simulate a hang loading foo.js.map
-            return new Promise(_ => {});
-          }
+        worker: {
+          getOriginalURLs: async source => {
+            if (source.id == "foo.js") {
+              // simulate a hang loading foo.js.map
+              return new Promise(_ => {});
+            }
 
-          return [source.id.replace(".js", ".cljs")];
-        },
-        getOriginalLocations: async items => items,
-        getGeneratedLocation: location => location
+            return [source.id.replace(".js", ".cljs")];
+          },
+          getOriginalLocations: async items => items,
+          getGeneratedLocation: location => location
+        }
       }
     );
     const { dispatch, getState } = dbg;

@@ -12,12 +12,7 @@ import { waitForMs } from "../utils/utils";
 import { newSources } from "./sources";
 import { updateWorkers } from "./debuggee";
 
-import {
-  clearASTs,
-  clearSymbols,
-  clearScopes,
-  clearSources
-} from "../workers/parser";
+import parser from "../workers/parser";
 
 import { clearWasmStates } from "../utils/wasm";
 import { getMainThread } from "../selectors";
@@ -34,13 +29,13 @@ import type { Action, ThunkArgs } from "./types";
  */
 export function willNavigate(event: Object) {
   return function({ dispatch, getState, client, sourceMaps }: ThunkArgs) {
-    sourceMaps.clearSourceMaps();
+    sourceMaps.worker.clearSourceMaps();
     clearWasmStates();
     clearDocuments();
-    clearSymbols();
-    clearASTs();
-    clearScopes();
-    clearSources();
+    parser.clearSymbols();
+    parser.clearASTs();
+    parser.clearScopes();
+    parser.clearSources();
     dispatch(navigate(event.url));
   };
 }

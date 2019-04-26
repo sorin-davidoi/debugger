@@ -53,7 +53,6 @@ import { makePendingLocationId } from "../../utils/breakpoint";
 function mockClient(bpPos = {}) {
   return {
     ...simpleMockThreadClient,
-
     getBreakpointPositions: async () => bpPos
   };
 }
@@ -61,15 +60,17 @@ function mockClient(bpPos = {}) {
 function mockSourceMaps() {
   return {
     ...sourceMaps,
-    getOriginalSourceText: async source => ({
-      id: source.id,
-      text: "",
-      contentType: "text/javascript"
-    }),
-    getGeneratedRangesForOriginal: async () => [
-      { start: { line: 0, column: 0 }, end: { line: 10, column: 10 } }
-    ],
-    getOriginalLocations: async items => items
+    worker: {
+      getOriginalSourceText: async source => ({
+        id: source.id,
+        text: "",
+        contentType: "text/javascript"
+      }),
+      getGeneratedRangesForOriginal: async () => [
+        { start: { line: 0, column: 0 }, end: { line: 10, column: 10 } }
+      ],
+      getOriginalLocations: async items => items
+    }
   };
 }
 
@@ -370,18 +371,20 @@ describe("adding sources", () => {
   it("corresponding breakpoints are added to the original source", async () => {
     const source = makeOriginalSource("bar.js", { sourceMapURL: "foo" });
     const store = createStore(mockClient({ "5": [2] }), loadInitialState(), {
-      getOriginalURLs: async () => [source.url],
-      getOriginalSourceText: async () => ({ source: "" }),
-      getGeneratedLocation: async (location, _source) => ({
-        line: location.line,
-        column: location.column,
-        sourceId: _source.id
-      }),
-      getOriginalLocation: async location => location,
-      getGeneratedRangesForOriginal: async () => [
-        { start: { line: 0, column: 0 }, end: { line: 10, column: 10 } }
-      ],
-      getOriginalLocations: async items => items
+      worker: {
+        getOriginalURLs: async () => [source.url],
+        getOriginalSourceText: async () => ({ source: "" }),
+        getGeneratedLocation: async (location, _source) => ({
+          line: location.line,
+          column: location.column,
+          sourceId: _source.id
+        }),
+        getOriginalLocation: async location => location,
+        getGeneratedRangesForOriginal: async () => [
+          { start: { line: 0, column: 0 }, end: { line: 10, column: 10 } }
+        ],
+        getOriginalLocations: async items => items
+      }
     });
 
     const { getState, dispatch } = store;

@@ -4,12 +4,23 @@
 
 // @flow
 
-import { workerUtils } from "devtools-utils";
-const { WorkerDispatcher } = workerUtils;
+import { LazyWorker } from "../utils";
+import type { Source, SearchModifiers } from "../../types";
 
-const dispatcher = new WorkerDispatcher();
-export const start = dispatcher.start.bind(dispatcher);
-export const stop = dispatcher.stop.bind(dispatcher);
+class SearchWorker extends LazyWorker {
+  constructor() {
+    super("search-worker.js");
+  }
 
-export const getMatches = dispatcher.task("getMatches");
-export const findSourceMatches = dispatcher.task("findSourceMatches");
+  async getMatches(...args: any[]): Promise<Object[]> {
+    return (await this.task("getMatches"))(...args);
+  }
+
+  async findSourceMatches(source: Source, queryText: string) {
+    return (await this.task("findSourceMatches"))(source, queryText);
+  }
+}
+
+const searchWorker = new SearchWorker();
+
+export default searchWorker;

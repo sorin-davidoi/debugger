@@ -228,11 +228,13 @@ describe("sources", () => {
       sourceThreadClient,
       {},
       {
-        getOriginalLocation: async location => ({ ...location, line: 12 }),
-        getOriginalLocations: async items => items,
-        getGeneratedLocation: async location => ({ ...location, line: 12 }),
-        getOriginalSourceText: async () => ({ source: "" }),
-        getGeneratedRangesForOriginal: async () => []
+        worker: {
+          getOriginalLocation: async location => ({ ...location, line: 12 }),
+          getOriginalLocations: async items => items,
+          getGeneratedLocation: async location => ({ ...location, line: 12 }),
+          getOriginalSourceText: async () => ({ source: "" }),
+          getGeneratedRangesForOriginal: async () => []
+        }
       }
     );
 
@@ -257,10 +259,12 @@ describe("sources", () => {
       sourceThreadClient,
       {},
       {
-        getOriginalLocation: async location => ({ ...location, line: 12 }),
-        getOriginalLocations: async items => items,
-        getGeneratedRangesForOriginal: async () => [],
-        getOriginalSourceText: async () => ({ source: "" })
+        worker: {
+          getOriginalLocation: async location => ({ ...location, line: 12 }),
+          getOriginalLocations: async items => items,
+          getGeneratedRangesForOriginal: async () => [],
+          getOriginalSourceText: async () => ({ source: "" })
+        }
       }
     );
 

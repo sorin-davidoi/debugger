@@ -4,7 +4,7 @@
 
 // @flow
 
-import { getSymbols } from "../../workers/parser";
+import parser from "../../workers/parser";
 import { findClosestFunction } from "../ast";
 
 import type { SourceLocation, Source, ASTLocation } from "../../types";
@@ -38,7 +38,7 @@ export async function findFunctionByName(
   name: ?string,
   index: number
 ) {
-  const symbols = await getSymbols(source.id);
+  const symbols = await parser.getSymbols(source.id);
   const functions = symbols.functions;
 
   return functions.find(node => node.name === name && node.index === index);

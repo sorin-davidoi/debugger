@@ -42,7 +42,7 @@ export function updateFrameLocation(
   if (frame.isOriginal) {
     return Promise.resolve(frame);
   }
-  return sourceMaps.getOriginalLocation(frame.location).then(loc => ({
+  return sourceMaps.worker.getOriginalLocation(frame.location).then(loc => ({
     ...frame,
     location: loc,
     generatedLocation: frame.generatedLocation || frame.location
@@ -119,7 +119,7 @@ async function expandFrames(
     }
     const originalFrames: ?Array<
       OriginalFrame
-    > = await sourceMaps.getOriginalStackFrames(frame.generatedLocation);
+    > = await sourceMaps.worker.getOriginalStackFrames(frame.generatedLocation);
     if (!originalFrames) {
       result.push(frame);
       continue;

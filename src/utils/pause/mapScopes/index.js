@@ -6,8 +6,7 @@
 
 import typeof SourceMaps from "devtools-source-map";
 
-import {
-  getScopes,
+import parser, {
   type SourceScope,
   type BindingData,
   type BindingLocation
@@ -60,8 +59,8 @@ export async function buildMappedScopes(
   },
   scope: OriginalScope
 }> {
-  const originalAstScopes = await getScopes(frame.location);
-  const generatedAstScopes = await getScopes(frame.generatedLocation);
+  const originalAstScopes = await parser.getScopes(frame.location);
+  const generatedAstScopes = await parser.getScopes(frame.generatedLocation);
 
   if (!originalAstScopes || !generatedAstScopes) {
     return null;
@@ -220,15 +219,15 @@ function batchScopeMappings(
         for (const loc of locs) {
           precalculatedRanges.set(
             buildLocationKey(loc.start),
-            sourceMaps.getGeneratedRanges(loc.start, source)
+            sourceMaps.worker.getGeneratedRanges(loc.start, source)
           );
           precalculatedLocations.set(
             buildLocationKey(loc.start),
-            sourceMaps.getGeneratedLocation(loc.start, source)
+            sourceMaps.worker.getGeneratedLocation(loc.start, source)
           );
           precalculatedLocations.set(
             buildLocationKey(loc.end),
-            sourceMaps.getGeneratedLocation(loc.end, source)
+            sourceMaps.worker.getGeneratedLocation(loc.end, source)
           );
         }
       }
@@ -241,7 +240,7 @@ function batchScopeMappings(
 
       if (s !== source || !precalculatedRanges.has(key)) {
         log("Bad precalculated mapping");
-        return sourceMaps.getGeneratedRanges(pos, s);
+        return sourceMaps.worker.getGeneratedRanges(pos, s);
       }
       return precalculatedRanges.get(key);
     },
@@ -250,7 +249,7 @@ function batchScopeMappings(
 
       if (s !== source || !precalculatedLocations.has(key)) {
         log("Bad precalculated mapping");
-        return sourceMaps.getGeneratedLocation(pos, s);
+        return sourceMaps.worker.getGeneratedLocation(pos, s);
       }
       return precalculatedLocations.get(key);
     }

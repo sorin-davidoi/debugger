@@ -18,6 +18,7 @@ export function setSource(source: Source) {
 
 export function getSource(sourceId: SourceId): Source {
   if (!cachedSources.has(sourceId)) {
+    console.trace(sourceId);
     throw new Error(`Parser: source ${sourceId} was not provided.`);
   }
 

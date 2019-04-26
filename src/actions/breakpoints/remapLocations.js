@@ -18,7 +18,7 @@ export default function remapLocations(
       if (breakpoint.location.sourceId !== sourceId) {
         return breakpoint;
       }
-      const location = await sourceMaps.getOriginalLocation(
+      const location = await sourceMaps.worker.getOriginalLocation(
         breakpoint.location
       );
       return { ...breakpoint, location };

@@ -13,7 +13,7 @@ import {
   getSelectedFrame
 } from "../../selectors";
 import { PROMISE } from "../utils/middleware/promise";
-import { getNextStep } from "../../workers/parser";
+import parser from "../../workers/parser";
 import { addHiddenBreakpoint } from "../breakpoints";
 import { evaluateExpressions } from "../expressions";
 import { selectLocation } from "../sources";
@@ -217,7 +217,10 @@ export function astCommand(thread: ThreadId, stepType: Command) {
       const source = getSource(getState(), frame.location.sourceId);
 
       if (source && hasAwait(source, frame.location)) {
-        const nextLocation = await getNextStep(source.id, frame.location);
+        const nextLocation = await parser.getNextStep(
+          source.id,
+          frame.location
+        );
         if (nextLocation) {
           await dispatch(addHiddenBreakpoint(nextLocation));
           return dispatch(command(thread, "resume"));

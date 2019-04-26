@@ -11,7 +11,7 @@ import { recordEvent } from "../../utils/telemetry";
 import { remapBreakpoints } from "../breakpoints";
 
 import { setSymbols } from "../ast";
-import { prettyPrint } from "../../workers/pretty-print";
+import prettyPrintWorker from "../../workers/pretty-print";
 import { getPrettySourceURL, isLoaded } from "../../utils/source";
 import { loadSourceText } from "./loadSourceText";
 import { mapFrames } from "../pause";
@@ -35,16 +35,26 @@ export async function prettyPrintSource(
   generatedSource: any
 ) {
   const url = getPrettySourceURL(generatedSource.url);
-  const { code, mappings } = await prettyPrint({
+  const { code, mappings } = await prettyPrintWorker.prettyPrint({
     source: generatedSource,
     url: url
   });
-  await sourceMaps.applySourceMap(generatedSource.id, url, code, mappings);
+  await sourceMaps.worker.applySourceMap(
+    generatedSource.id,
+    url,
+    code,
+    mappings
+  );
 
   // The source map URL service used by other devtools listens to changes to
   // sources based on their actor IDs, so apply the mapping there too.
   for (const sourceActor of generatedSource.actors) {
-    await sourceMaps.applySourceMap(sourceActor.actor, url, code, mappings);
+    await sourceMaps.worker.applySourceMap(
+      sourceActor.actor,
+      url,
+      code,
+      mappings
+    );
   }
   return {
     id: prettySource.id,
@@ -118,7 +128,9 @@ export function togglePrettyPrint(sourceId: string) {
 
     const options = {};
     if (selectedLocation) {
-      options.location = await sourceMaps.getOriginalLocation(selectedLocation);
+      options.location = await sourceMaps.worker.getOriginalLocation(
+        selectedLocation
+      );
     }
 
     if (prettySource) {

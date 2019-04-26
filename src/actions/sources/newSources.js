@@ -109,7 +109,7 @@ function loadSourceMap(sourceId: SourceId) {
         // however, so use that for resolving any source maps in the source.
         urlInfo.url = urlInfo.introductionUrl;
       }
-      urls = await sourceMaps.getOriginalURLs(urlInfo);
+      urls = await sourceMaps.worker.getOriginalURLs(urlInfo);
     } catch (e) {
       console.error(e);
     }

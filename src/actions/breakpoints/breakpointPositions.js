@@ -27,7 +27,7 @@ async function mapLocations(
   generatedLocations: SourceLocation[],
   { sourceMaps }: { sourceMaps: typeof SourceMaps }
 ) {
-  const originalLocations = await sourceMaps.getOriginalLocations(
+  const originalLocations = await sourceMaps.worker.getOriginalLocations(
     generatedLocations
   );
 
@@ -69,7 +69,8 @@ async function _setBreakpointPositions(sourceId, thunkArgs) {
   if (isOriginalId(sourceId)) {
     // Explicitly typing ranges is required to work around the following issue
     // https://github.com/facebook/flow/issues/5294
-    const ranges: Range[] = await sourceMaps.getGeneratedRangesForOriginal(
+    const { getGeneratedRangesForOriginal } = sourceMaps.worker;
+    const ranges: Range[] = await getGeneratedRangesForOriginal(
       sourceId,
       generatedSource.url,
       true

@@ -37,7 +37,7 @@ export function toggleBlackBox(source: Source) {
 
     let sourceId, range;
     if (features.originalBlackbox && isOriginalId(source.id)) {
-      range = await sourceMaps.getFileGeneratedRange(source);
+      range = await sourceMaps.worker.getFileGeneratedRange(source);
       sourceId = originalToGeneratedId(source.id);
     } else {
       sourceId = source.id;

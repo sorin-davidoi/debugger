@@ -16,7 +16,7 @@ import {
 
 import { makeWhyNormal } from "../../../utils/test-mockup";
 
-import * as parser from "../../../workers/parser/index";
+import parser from "../../../workers/parser/index";
 
 const { isStepping } = selectors;
 
@@ -255,13 +255,15 @@ describe("pause", () => {
       };
 
       const sourceMapsMock = {
-        getOriginalLocation: () => Promise.resolve(originalLocation),
-        getOriginalLocations: async items => items,
-        getOriginalSourceText: async () => ({
-          source: "\n\nfunction fooOriginal() {\n  return -5;\n}",
-          contentType: "text/javascript"
-        }),
-        getGeneratedLocation: async location => location
+        worker: {
+          getOriginalLocation: () => Promise.resolve(originalLocation),
+          getOriginalLocations: async items => items,
+          getOriginalSourceText: async () => ({
+            source: "\n\nfunction fooOriginal() {\n  return -5;\n}",
+            contentType: "text/javascript"
+          }),
+          getGeneratedLocation: async location => location
+        }
       };
 
       const store = createStore(mockThreadClient, {}, sourceMapsMock);
@@ -320,14 +322,16 @@ describe("pause", () => {
       ];
 
       const sourceMapsMock = {
-        getOriginalStackFrames: loc => Promise.resolve(originStackFrames),
-        getOriginalLocation: () => Promise.resolve(originalLocation),
-        getOriginalLocations: async items => items,
-        getOriginalSourceText: async () => ({
-          source: "fn fooBar() {}\nfn barZoo() { fooBar() }",
-          contentType: "text/rust"
-        }),
-        getGeneratedRangesForOriginal: async () => []
+        worker: {
+          getOriginalStackFrames: loc => Promise.resolve(originStackFrames),
+          getOriginalLocation: () => Promise.resolve(originalLocation),
+          getOriginalLocations: async items => items,
+          getOriginalSourceText: async () => ({
+            source: "fn fooBar() {}\nfn barZoo() { fooBar() }",
+            contentType: "text/rust"
+          }),
+          getGeneratedRangesForOriginal: async () => []
+        }
       };
 
       const store = createStore(mockThreadClient, {}, sourceMapsMock);

@@ -72,13 +72,15 @@ describe("project text search", () => {
     const source2 = makeSource("bar:formatted");
 
     const mockMaps = {
-      getOriginalSourceText: async () => ({
-        source: "function bla(x, y) {\n const bar = 4; return 2;\n}",
-        contentType: "text/javascript"
-      }),
-      getOriginalURLs: async () => [source2.url],
-      getGeneratedRangesForOriginal: async () => [],
-      getOriginalLocations: async items => items
+      worker: {
+        getOriginalSourceText: async () => ({
+          source: "function bla(x, y) {\n const bar = 4; return 2;\n}",
+          contentType: "text/javascript"
+        }),
+        getOriginalURLs: async () => [source2.url],
+        getGeneratedRangesForOriginal: async () => [],
+        getOriginalLocations: async items => items
+      }
     };
 
     const { dispatch, getState } = createStore(threadClient, {}, mockMaps);

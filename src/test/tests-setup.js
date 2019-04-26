@@ -16,23 +16,14 @@ import Adapter from "enzyme-adapter-react-16";
 import { setupHelper } from "../utils/dbg";
 import { prefs } from "../utils/prefs";
 
-import { startSourceMapWorker, stopSourceMapWorker } from "devtools-source-map";
-
-import {
-  start as startPrettyPrintWorker,
-  stop as stopPrettyPrintWorker
-} from "../workers/pretty-print";
-
-import {
-  start as startParserWorker,
-  stop as stopParserWorker,
-  clearSymbols,
-  clearASTs
-} from "../workers/parser";
-import {
-  start as startSearchWorker,
-  stop as stopSearchWorker
-} from "../workers/search";
+import parser from "../workers/parser";
+import search from "../workers/search";
+import prettyPrint from "../workers/pretty-print";
+import { worker as sourceMapWorker } from "devtools-source-map";
+// start as startParserWorker,
+// stop as stopParserWorker,
+// clearSymbols,
+// clearASTs
 import { clearDocuments } from "../utils/editor";
 import { clearHistory } from "./utils/history";
 
@@ -69,31 +60,31 @@ function formatException(reason, p) {
 }
 
 beforeAll(() => {
-  startSourceMapWorker(
-    path.join(rootPath, "node_modules/devtools-source-map/src/worker.js"),
-    ""
+  sourceMapWorker._enforceUrl(
+    path.join(rootPath, "node_modules/devtools-source-map/src/worker.js")
+    // ""
   );
-  startPrettyPrintWorker(
+  prettyPrint._enforceUrl(
     path.join(rootPath, "src/workers/pretty-print/worker.js")
   );
-  startParserWorker(path.join(rootPath, "src/workers/parser/worker.js"));
-  startSearchWorker(path.join(rootPath, "src/workers/search/worker.js"));
+  parser._enforceUrl(path.join(rootPath, "src/workers/parser/worker.js"));
+  search._enforceUrl(path.join(rootPath, "src/workers/search/worker.js"));
   process.on("unhandledRejection", formatException);
 });
 
 afterAll(() => {
-  stopSourceMapWorker();
-  stopPrettyPrintWorker();
-  stopParserWorker();
-  stopSearchWorker();
+  sourceMapWorker.destroy();
+  prettyPrint.destroy();
+  parser.destroy();
+  search.destroy();
   process.removeListener("unhandledRejection", formatException);
 });
 
 afterEach(() => {});
 
 beforeEach(async () => {
-  clearASTs();
-  await clearSymbols();
+  await parser.clearASTs();
+  await parser.clearSymbols();
   clearHistory();
   clearDocuments();
   prefs.projectDirectoryRoot = "";

@@ -9,7 +9,7 @@
  * @module actions/search
  */
 
-import { findSourceMatches } from "../workers/search";
+import searchWorker from "../workers/search";
 import { getSource, hasPrettySource, getSourceList } from "../selectors";
 import { isThirdParty } from "../utils/source";
 import { loadSourceText } from "./sources/loadSourceText";
@@ -108,7 +108,7 @@ export function searchSource(sourceId: string, query: string) {
       return;
     }
 
-    const matches = await findSourceMatches(source, query);
+    const matches = await searchWorker.findSourceMatches(source, query);
     if (!matches.length) {
       return;
     }

@@ -13,7 +13,7 @@ import {
   searchSourceForHighlight
 } from "../utils/editor";
 import { isWasm, renderWasmText } from "../utils/wasm";
-import { getMatches } from "../workers/search";
+import search from "../workers/search";
 import type { Action, FileTextSearchModifier, ThunkArgs } from "./types";
 import type { WasmSource } from "../types";
 
@@ -115,7 +115,7 @@ export function searchContents(query: string, editor: Object) {
       text = renderWasmText(((selectedSource: any): WasmSource)).join("\n");
     }
 
-    const matches = await getMatches(query, text, _modifiers);
+    const matches = await search.getMatches(query, text, _modifiers);
 
     const res = find(ctx, query, true, _modifiers);
     if (!res) {
