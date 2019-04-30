@@ -4,8 +4,10 @@
 
 // @flow
 
-import { LazyWorker } from "../utils";
-import type { Source, SearchModifiers } from "../../types";
+import { workerUtils } from "devtools-utils";
+import type { Source } from "../../types";
+
+const { LazyWorker } = workerUtils;
 
 class SearchWorker extends LazyWorker {
   constructor() {

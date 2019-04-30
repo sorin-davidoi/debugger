@@ -4,12 +4,14 @@
 
 // @flow
 
-import { LazyWorker } from "../utils";
+import { workerUtils } from "devtools-utils";
 
 import type { AstLocation, AstPosition } from "./types";
 import type { SourceLocation, Source, SourceId } from "../../types";
 import type { SourceScope } from "./getScopes/visitor";
 import type { SymbolDeclarations } from "./getSymbols";
+
+const { LazyWorker } = workerUtils;
 
 class ParserWorker extends LazyWorker {
   constructor() {

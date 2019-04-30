@@ -4,11 +4,13 @@
 
 // @flow
 
-import { LazyWorker } from "../utils";
+import { workerUtils } from "devtools-utils";
 import { isJavaScript } from "../../utils/source";
 import assert from "../../utils/assert";
 
 import type { Source } from "../../types";
+
+const { LazyWorker } = workerUtils;
 
 type PrettyPrintOpts = {
   source: Source,

@@ -4,7 +4,7 @@
 
 // @flow
 
-import { LazyWorker } from "../../../src/workers/utils";
+import { workerUtils } from "devtools-utils";
 
 import type {
   OriginalFrame,
@@ -15,6 +15,8 @@ import type {
 } from "../../../src/types";
 import type { SourceMapConsumer } from "source-map";
 import type { locationOptions } from "./source-map";
+
+const { LazyWorker } = workerUtils;
 
 class SourceMapWorker extends LazyWorker {
   constructor() {

@@ -4,6 +4,12 @@
 
 // @flow
 
+// import { isDevelopment } from "devtools-environment";
+
+const workerPath = true
+  ? "assets/build"
+  : "resource://devtools/client/debugger/new/dist";
+
 export type Message = {
   data: {
     id: string,
@@ -12,18 +18,21 @@ export type Message = {
   }
 };
 
-function WorkerDispatcher() {
-  this.msgId = 1;
-  this.worker = null;
-}
+class WorkerDispatcher {
+  msgId: number;
+  worker: any;
 
-WorkerDispatcher.prototype = {
-  start(url: string, win = window) {
-    this.worker = new win.Worker(url);
+  constructor() {
+    this.msgId = 1;
+    this.worker = null;
+  }
+
+  start(url: string, win: window) {
+    this.worker = new (win || window).Worker(url);
     this.worker.onerror = () => {
       console.error(`Error in worker ${url}`);
     };
-  },
+  }
 
   stop() {
     if (!this.worker) {
@@ -32,11 +41,11 @@ WorkerDispatcher.prototype = {
 
     this.worker.terminate();
     this.worker = null;
-  },
+  }
 
   task(
     method: string,
-    { queue = false } = {}
+    { queue = false }: { queue: boolean } = {}
   ): (...args: any[]) => Promise<any> {
     const calls = [];
     const push = (args: Array<any>) => {
@@ -94,12 +103,12 @@ WorkerDispatcher.prototype = {
     };
 
     return (...args: any) => push(args);
-  },
+  }
 
   invoke(method: string, ...args: any[]): Promise<any> {
     return this.task(method)(...args);
   }
-};
+}
 
 function workerHandler(publicInterface: Object) {
   return function(msg: Message) {
@@ -128,6 +137,50 @@ function workerHandler(publicInterface: Object) {
       self.postMessage({ id, results });
     });
   };
+}
+
+class LazyWorker {
+  _url: string;
+  _enforcedUrl: ?string;
+  _tasks: Map<string, (...args: any[]) => Promise<any>>;
+  _dispatcher: WorkerDispatcher;
+
+  constructor(url: string) {
+    this._url = url;
+    this._tasks = new Map();
+  }
+
+  get dispatcher(): WorkerDispatcher {
+    if (!this._dispatcher) {
+      this._dispatcher = new WorkerDispatcher();
+      this._dispatcher.start(this._enforcedUrl || `${workerPath}/${this._url}`);
+    }
+
+    return this._dispatcher;
+  }
+
+  async task(
+    name: string,
+    { queue = false }: { queue: boolean } = {}
+  ): Promise<any> {
+    if (!this._tasks.has(name)) {
+      this._tasks.set(name, this.dispatcher.task(name, { queue }));
+    }
+
+    return this._tasks.get(name);
+  }
+
+  async destroy() {
+    if (this._dispatcher) {
+      this._dispatcher.stop();
+    }
+
+    this._tasks.clear();
+  }
+
+  _enforceUrl(url: string) {
+    this._enforcedUrl = url;
+  }
 }
 
 function streamingWorkerHandler(
@@ -177,5 +230,6 @@ function streamingWorkerHandler(
 module.exports = {
   WorkerDispatcher,
   workerHandler,
+  LazyWorker,
   streamingWorkerHandler
 };
