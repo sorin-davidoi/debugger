@@ -35,6 +35,7 @@ import {
 } from "../../selectors";
 
 import type { SourceLocation, PartialPosition, Source } from "../../types";
+import { doubleRAF } from "../../utils/raf";
 import type { ThunkArgs } from "../types";
 
 export const setSelectedLocation = (
@@ -92,6 +93,7 @@ export function selectSource(
   options: PartialPosition = { line: 1 }
 ) {
   return async ({ dispatch }: ThunkArgs) => {
+    console.log("SELECTING SOURCE!!!", sourceId);
     const location = createLocation({ ...options, sourceId });
     return dispatch(selectSpecificLocation(location));
   };
@@ -107,6 +109,8 @@ export function selectLocation(
 ) {
   return async ({ dispatch, getState, sourceMaps, client }: ThunkArgs) => {
     const currentSource = getSelectedSource(getState());
+
+    console.log("QQQQQQQQQQQQQQQQQQQQQQQQQQQQ", !!client);
 
     if (!client) {
       // No connection, do nothing. This happens when the debugger is
@@ -142,7 +146,22 @@ export function selectLocation(
       dispatch(addTab(source));
     }
 
+    const loadingSource: Source = { ...source, loadedState: "loading" };
+
+    dispatch(setSelectedLocation(loadingSource, location));
+
+    // tabs
+
+    // // Allow the loading state to render before continuing
+    console.error("BEFORE RAF");
+    await doubleRAF();
+    console.error("AFTER RAF");
+
     dispatch(setSelectedLocation(source, location));
+
+    // if (!getSourcesForTabs(getState()).includes(loadingSource)) {
+    //   return;
+    // }
 
     await dispatch(loadSourceText(source));
     const loadedSource = getSource(getState(), source.id);

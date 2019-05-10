@@ -5,6 +5,7 @@
 // @flow
 
 import { getSymbols } from "../../../reducers/ast";
+import * as raf from "../../../utils/raf";
 import {
   actions,
   selectors,
@@ -25,6 +26,9 @@ const {
 } = selectors;
 
 import { sourceThreadClient } from "../../tests/helpers/threadClient.js";
+
+// $FlowIgnore
+raf.doubleRAF = jest.fn(() => Promise.resolve());
 
 process.on("unhandledRejection", (reason, p) => {});
 

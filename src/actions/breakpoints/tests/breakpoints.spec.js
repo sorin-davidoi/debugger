@@ -4,6 +4,8 @@
 
 // @flow
 
+import * as raf from "../../../utils/raf";
+
 import {
   createStore,
   selectors,
@@ -13,6 +15,9 @@ import {
 } from "../../../utils/test-head";
 
 import { simpleMockThreadClient } from "../../tests/helpers/threadClient.js";
+
+// $FlowIgnore
+raf.doubleRAF = jest.fn(() => Promise.resolve());
 
 function mockClient(positionsResponse = {}) {
   return {

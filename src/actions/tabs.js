@@ -66,10 +66,14 @@ export function closeTab(source: Source) {
   return ({ dispatch, getState, client }: ThunkArgs) => {
     const { id, url } = source;
 
+    console.warn("TABS:", getSourceTabs(getState()));
+    console.log("REMOVING SOURCE", source);
+
     removeDocument(id);
 
     const tabs = removeSourceFromTabList(getSourceTabs(getState()), source);
     const sourceId = getNewSelectedSourceId(getState(), tabs);
+    console.log("NEW SOURCE ID", sourceId);
     dispatch(({ type: "CLOSE_TAB", url, tabs }: Action));
     dispatch(selectSource(sourceId));
   };
